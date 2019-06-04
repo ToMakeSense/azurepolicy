@@ -1,0 +1,47 @@
+{
+  "type": "Microsoft.Authorization/policyDefinitions",
+  "name": "allowed-api-management-services-skus-policyDef",
+  "properties": {
+    "displayName": "Allowed API management services SKUs",
+    "description": "This policy enables you to specify a set of API management services SKUs that your organization can deploy",
+    "metadata": {
+      "category": "Api Management"
+    },
+    "mode": "Indexed",
+    "parameters": {
+      "listOfAllowedSKUs": {
+        "type": "Array",
+        "metadata": {
+          "displayName": "Allowed SKUs",
+          "description": "The list of SKUs that can be specified for API management services"
+        },
+        "allowedValues": [
+          "Consumption",
+          "Developer",
+          "Basic",
+          "Standard",
+          "Premium"
+        ]
+      }
+    },
+    "policyRule": {
+      "if": {
+        "allOf": [
+          {
+            "field": "type",
+            "equals": "Microsoft.ApiManagement/service"
+          },
+          {
+            "not": {
+              "field": "Microsoft.ApiManagement/service/sku.name",
+              "in": "[parameters('listOfAllowedSKUs')]"
+            }
+          }
+        ]
+      },
+      "then": {
+        "effect": "deny"
+      }
+    }
+  }
+}

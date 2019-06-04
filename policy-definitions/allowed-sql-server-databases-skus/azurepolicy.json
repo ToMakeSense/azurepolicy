@@ -1,0 +1,51 @@
+{
+  "type": "Microsoft.Authorization/policyDefinitions",
+  "name": "allowed-sql-server-databases-skus-policyDef",
+  "properties": {
+    "displayName": "Allowed Sql servers databases SKUs",
+    "description": "This policy enables you to specify a set of Sql servers databases SKUs that your organization can deploy",
+    "metadata": {
+      "category": "SQL"
+    },
+    "mode": "Indexed",
+    "parameters": {
+      "listOfAllowedSKUs": {
+        "type": "Array",
+        "metadata": {
+          "displayName": "Allowed SKUs",
+          "description": "The list of SKUs that can be specified for Sql servers databases"
+        },
+        "allowedValues": [
+          "None",
+          "Free",
+          "Basic",
+          "Standard",
+          "Premium",
+          "Stretch",
+          "GeneralPurpose",
+          "DataWarehouse",
+          "BusinessCritical"
+        ]
+      }
+    },
+    "policyRule": {
+      "if": {
+        "allOf": [
+          {
+            "field": "type",
+            "equals": "Microsoft.Sql/servers/databases"
+          },
+          {
+            "not": {
+              "field": "Microsoft.Sql/servers/databases/sku.tier",
+              "in": "[parameters('listOfAllowedSKUs')]"
+            }
+          }
+        ]
+      },
+      "then": {
+        "effect": "deny"
+      }
+    }
+  }
+}
